@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cronômetro e Temporizador</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #0d1117;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        gap: 30px;
+    }
+
+    .container {
+        background: #161b22;
+        padding: 25px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 0 10px #000;
+        width: 300px;
+    }
+
+    h2 {
+        color: #58a6ff;
+    }
+
+    .time {
+        font-size: 2em;
+        margin: 15px 0;
+    }
+
+    button {
+        background: #238636;
+        border: none;
+        padding: 10px 15px;
+        margin: 5px;
+        border-radius: 8px;
+        color: #fff;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    button:hover {
+        background: #2ea043;
+    }
+
+    input {
+        width: 70px;
+        text-align: center;
+        border-radius: 5px;
+        border: 1px solid #30363d;
+        padding: 5px;
+        background: #0d1117;
+        color: #fff;
+    }
+
+    .laps {
+        margin-top: 10px;
+        max-height: 100px;
+        overflow-y: auto;
+        font-size: 0.9em;
+        text-align: left;
+    }
+</style>
+</head>
+<body>
+
+<div class="container" id="cronometro">
+    <h2>Cronômetro</h2>
+    <div class="time" id="cronometroDisplay">00:00:00</div>
+    <button onclick="iniciarCronometro()">Iniciar</button>
+    <button id="btnPausarCronometro" onclick="pausarOuRetomarCronometro()">Pausar</button>
+    <button onclick="resetarCronometro()">Parar</button>
+    <button onclick="registrarVolta()">Volta</button>
+    <div class="laps" id="voltas"></div>
+</div>
+
+<div class="container" id="temporizador">
+    <h2>Temporizador</h2>
+    <div>
+        <input type="number" id="minutos" placeholder="Min" min="0">
+        <input type="number" id="segundos" placeholder="Seg" min="0" max="59">
+    </div>
+    <div class="time" id="timerDisplay">00:00</div>
+    <button onclick="iniciarTimer()">Iniciar</button>
+    <button id="btnPausarTimer" onclick="pausarOuRetomarTimer()">Pausar</button>
+    <button onclick="resetarTimer()">Parar</button>
+</div>
+
+<audio id="alarme" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"></audio>
+
+<script>
+    //cronometro
+    let cronometroInterval, segundos = 0, minutos = 0, horas = 0;
+    let cronometroRodando = false, cronometroPausado = false;
+
+    function atualizarCronometro() {
+        segundos++;
+        if (segundos === 60) { segundos = 0; minutos++; }
+        if (minutos === 60) { minutos = 0; horas++; }
+
+        document.getElementById("cronometroDisplay").textContent =
+            `${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
+    }
+
+    function iniciarCronometro() {
+        if (!cronometroRodando) {
+            cronometroRodando = true;
+            cronometroPausado = false;
+            document.getElementById("btnPausarCronometro").textContent = "Pausar";
+            cronometroInterval = setInterval(atualizarCronometro, 1000);
+        }
+    }
+
+    function pausarOuRetomarCronometro() {
+        const btn = document.getElementById("btnPausarCronometro");
+        if (cronometroRodando && !cronometroPausado) {
+            clearInterval(cronometroInterval);
+            cronometroPausado = true;
+            btn.textContent = "Retomar";
+        } else if (cronometroRodando && cronometroPausado) {
+            cronometroInterval = setInterval(atualizarCronometro, 1000);
+            cronometroPausado = false;
+            btn.textContent = "Pausar";
+        }
+    }
+
+    function resetarCronometro() {
+        clearInterval(cronometroInterval);
+        segundos = minutos = horas = 0;
+        cronometroRodando = false;
+        cronometroPausado = false;
+        document.getElementById("cronometroDisplay").textContent = "00:00:00";
+        document.getElementById("voltas").innerHTML = "";
+        document.getElementById("btnPausarCronometro").textContent = "Pausar";
+    }
+
+    function registrarVolta() {
+        const voltasDiv = document.getElementById("voltas");
+        const tempo = document.getElementById("cronometroDisplay").textContent;
+        const p = document.createElement("p");
+        p.textContent = `Volta: ${tempo}`;
+        voltasDiv.appendChild(p);
+    }
+
+    //temporizador
+    let timerInterval, tempoRestante = 0, timerRodando = false, timerPausado = false;
+
+    function atualizarTimer() {
+        if (tempoRestante > 0) {
+            tempoRestante--;
+            const min = Math.floor(tempoRestante / 60);
+            const seg = tempoRestante % 60;
+            document.getElementById("timerDisplay").textContent =
+                `${String(min).padStart(2, '0')}:${String(seg).padStart(2, '0')}`;
+        } else {
+            clearInterval(timerInterval);
+            timerRodando = false;
+            document.getElementById("timerDisplay").textContent = "00:00";
+            document.getElementById("alarme").play();
+            alert("⏰ Tempo esgotado!");
+        }
+    }
+
+    function iniciarTimer() {
+        if (!timerRodando) {
+            const min = parseInt(document.getElementById("minutos").value) || 0;
+            const seg = parseInt(document.getElementById("segundos").value) || 0;
+            tempoRestante = min * 60 + seg;
+            if (tempoRestante > 0) {
+                timerRodando = true;
+                timerPausado = false;
+                document.getElementById("btnPausarTimer").textContent = "Pausar";
+                timerInterval = setInterval(atualizarTimer, 1000);
+            }
+        }
+    }
+
+    function pausarOuRetomarTimer() {
+        const btn = document.getElementById("btnPausarTimer");
+        if (timerRodando && !timerPausado) {
+            clearInterval(timerInterval);
+            timerPausado = true;
+            btn.textContent = "Retomar";
+        } else if (timerRodando && timerPausado) {
+            timerInterval = setInterval(atualizarTimer, 1000);
+            timerPausado = false;
+            btn.textContent = "Pausar";
+        }
+    }
+
+    function resetarTimer() {
+        clearInterval(timerInterval);
+        tempoRestante = 0;
+        timerRodando = false;
+        timerPausado = false;
+        document.getElementById("timerDisplay").textContent = "00:00";
+        document.getElementById("btnPausarTimer").textContent = "Pausar";
+    }
+</script>
+
+</body>
+</html>
