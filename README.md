@@ -1,7 +1,3 @@
-Claro — aqui está a documentação **formatada perfeitamente em Markdown**, pronta para copiar e colar no README **sem quebrar nada**.
-
----
-
 # Cronômetro e Temporizador – Aplicação Web
 
 Aplicação simples que combina um **cronômetro** e um **temporizador regressivo**, desenvolvida em **HTML, CSS e JavaScript puro**.
