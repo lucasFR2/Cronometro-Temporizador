@@ -1,9 +1,5 @@
 # ⏱️ Cronômetro e Temporizador Web
 
-<div align="center">
-  <img src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" alt="Timer App" height="120"/>
-</div>
-
 Aplicação web leve que integra um **cronômetro** e um **temporizador regressivo**, desenvolvida inteiramente em **HTML, CSS e JavaScript** sem frameworks externos.
 
 ## 📋 Sumário
