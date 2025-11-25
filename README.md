@@ -117,10 +117,4 @@ index.html
 
 ---
 
-## 📄 Licença
-
-Este projeto está sob licença MIT. Livre para uso, modificação e distribuição!
-
----
-
 **Dúvidas, sugestões ou problemas? Abra uma [issue](https://github.com/lucasFR2/Cronometro-Temporizador/issues)!**
